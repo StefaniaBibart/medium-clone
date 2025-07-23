@@ -6,6 +6,13 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { UserStore } from '../../../entities/user/store/user.store';
 
+interface RegisterError {
+  error?: {
+    errors?: Record<string, string[]>;
+    message?: string;
+  };
+}
+
 @Component({
   selector: 'app-register',
   imports: [ReactiveFormsModule, CommonModule],
@@ -40,13 +47,15 @@ export class Register {
       }
 
       if (error) {
-        const errorMessages = this.handleRegistrationError(error);
+        const errorMessages = this.handleRegistrationError(
+          error as unknown as RegisterError,
+        );
         this._errors.set(errorMessages);
       }
     });
   }
 
-  private handleRegistrationError(error: any): string[] {
+  private handleRegistrationError(error: RegisterError): string[] {
     if (error?.error?.errors) {
       return Object.entries(error.error.errors).map(
         ([field, messages]) =>

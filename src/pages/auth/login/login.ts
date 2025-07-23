@@ -47,7 +47,9 @@ export class Login {
       }
 
       if (error) {
-        const errorMessages = this.handleLoginError(error);
+        const errorMessages = this.handleLoginError(
+          error as unknown as LoginError,
+        );
         this._serverErrors.set(errorMessages);
       }
     });

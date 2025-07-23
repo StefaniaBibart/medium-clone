@@ -1,5 +1,5 @@
-import { Injectable, inject, signal, Signal } from '@angular/core';
-import { HttpClient, httpResource } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { UserStore } from '../store/user.store';
 import { NewUser } from '../model/new-user.model';
@@ -55,7 +55,7 @@ export class UserService {
     this.store.setCurrentUser(user);
   }
 
-  clearCurrentUser() {
+  logout(): void {
     this.store.logout();
   }
 }

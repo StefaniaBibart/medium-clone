@@ -11,7 +11,7 @@ import { User } from '../model/user.model';
 interface UserState {
   currentUser: User | null;
   isLoading: boolean;
-  error: any;
+  error: Record<string, string[]> | null;
 }
 
 const initialState: UserState = {
@@ -47,7 +47,7 @@ export const UserStore = signalStore(
       setLoading(loading: boolean) {
         patchState(store, { isLoading: loading });
       },
-      setError(error: any) {
+      setError(error: Record<string, string[]> | null) {
         patchState(store, { error, isLoading: false });
       },
       clearError() {
@@ -69,12 +69,6 @@ export const UserStore = signalStore(
           return;
         }
         tokenSignal.set(token);
-      },
-      getTokenSignal() {
-        return tokenSignal;
-      },
-      getStoredToken() {
-        return localStorage.getItem(TOKEN_KEY);
       },
     };
   }),
