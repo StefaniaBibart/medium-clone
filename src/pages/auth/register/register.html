@@ -7,33 +7,44 @@
           <a href="/login">Have an account?</a>
         </p>
 
-        <ul class="error-messages">
-          <li>That email is already taken</li>
-        </ul>
+        @if (errors().length > 0) {
+          <ul class="error-messages">
+            @for (error of errors(); track $index) {
+              <li>{{ error }}</li>
+            }
+          </ul>
+        }
 
-        <form>
-          <fieldset class="form-group">
-            <input
-              class="form-control form-control-lg"
-              type="text"
-              placeholder="Username"
-            />
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+          <fieldset [disabled]="isLoading()">
+            <fieldset class="form-group">
+              <input
+                class="form-control form-control-lg"
+                type="text"
+                placeholder="Username"
+                formControlName="username"
+              />
+            </fieldset>
+            <fieldset class="form-group">
+              <input
+                class="form-control form-control-lg"
+                type="email"
+                placeholder="Email"
+                formControlName="email"
+              />
+            </fieldset>
+            <fieldset class="form-group">
+              <input
+                class="form-control form-control-lg"
+                type="password"
+                placeholder="Password"
+                formControlName="password"
+              />
+            </fieldset>
+            <button class="btn btn-lg btn-primary pull-xs-right" type="submit">
+              {{ isLoading() ? "Signing up..." : "Sign up" }}
+            </button>
           </fieldset>
-          <fieldset class="form-group">
-            <input
-              class="form-control form-control-lg"
-              type="text"
-              placeholder="Email"
-            />
-          </fieldset>
-          <fieldset class="form-group">
-            <input
-              class="form-control form-control-lg"
-              type="password"
-              placeholder="Password"
-            />
-          </fieldset>
-          <button class="btn btn-lg btn-primary pull-xs-right">Sign up</button>
         </form>
       </div>
     </div>
