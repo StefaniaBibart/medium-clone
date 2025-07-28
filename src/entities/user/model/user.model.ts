@@ -1,7 +1,8 @@
 export interface User {
-  email: string;
+  email?: string;
   token: string;
   username: string;
-  bio: string | null;
-  image: string | null;
+  bio?: string | null;
+  image?: string | null;
+  admin?: boolean;
 }

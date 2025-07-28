@@ -6,6 +6,7 @@ import { NewUser } from '../model/new-user.model';
 import { UserResponse } from '../model/user-response.model';
 import { LoginUser } from '../model/login-user.model';
 import { User } from '../model/user.model';
+// import { httpResource } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -50,6 +51,22 @@ export class UserService {
         },
       });
   }
+
+  // endpoint is not working
+  // getCurrentUser() {
+  //   return httpResource<UserResponse>(() => {
+  //     const token = this.store.token();
+  //     if (!token) {
+  //       return undefined;
+  //     }
+  //     return {
+  //       url: `${this.apiUrl}/users`,
+  //       headers: {
+  //         Authorization: `Token ${token}`,
+  //       },
+  //     };
+  //   });
+  // }
 
   setCurrentUser(user: User) {
     this.store.setCurrentUser(user);

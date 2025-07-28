@@ -6,6 +6,8 @@ import {
   withComputed,
 } from '@ngrx/signals';
 import { computed, effect, signal } from '@angular/core';
+import { jwtDecode } from 'jwt-decode';
+
 import { User } from '../model/user.model';
 
 interface UserState {
@@ -68,6 +70,25 @@ export const UserStore = signalStore(
           });
           return;
         }
+
+        const decodedToken: {
+          id: string;
+          username: string;
+          admin: boolean;
+        } = jwtDecode(token);
+
+        const user: User = {
+          token,
+          username: decodedToken.username,
+          admin: decodedToken.admin,
+        };
+
+        patchState(store, {
+          currentUser: user,
+          isLoading: false,
+          error: null,
+        });
+
         tokenSignal.set(token);
       },
     };
