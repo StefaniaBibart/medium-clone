@@ -1,0 +1,14 @@
+<div class="article-meta">
+  <a [routerLink]="['/profile', username]">
+    <img [src]="currentUser()?.image || ''" />
+  </a>
+  <div class="info">
+    <a [routerLink]="['/profile', username()]" class="author">{{
+      username()
+    }}</a>
+    <span class="date">January 20th</span>
+  </div>
+  <button class="btn btn-outline-primary btn-sm pull-xs-right">
+    <i class="ion-heart"></i> 29
+  </button>
+</div>
