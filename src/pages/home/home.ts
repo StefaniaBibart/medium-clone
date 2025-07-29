@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UserStore } from '../../entities/user/store/user.store';
+import { ArticlePreview } from '../../entities/article/ui/article-preview/article-preview';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ArticlePreview],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
