@@ -1,15 +1,15 @@
-import { Component, Input, Signal, inject, input, signal } from '@angular/core';
-import { User } from '../../../user/model/user.model';
+import { Component, input } from '@angular/core';
+import { Article } from '../../model/article.model';
 import { ArticleMeta } from '../article-meta/article-meta';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'article-preview',
   standalone: true,
-  imports: [ArticleMeta],
+  imports: [ArticleMeta, RouterLink],
   templateUrl: './article-preview.html',
   styleUrl: './article-preview.css',
 })
 export class ArticlePreview {
-  username = input<string | undefined>(undefined);
-  currentUser = input<User | null | undefined>(undefined);
+  article = input<Article | undefined>();
 }

@@ -1,15 +1,15 @@
-import { Component, Input, inject, input } from '@angular/core';
-import { User } from '../../../user/model/user.model';
+import { Component, input } from '@angular/core';
+import { Article } from '../../model/article.model';
 import { RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'article-meta',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe],
   templateUrl: './article-meta.html',
-  styleUrl: './article-meta.css',
+  styleUrls: ['./article-meta.css'],
 })
 export class ArticleMeta {
-  currentUser = input<User | null | undefined>(undefined);
-  username = input<string | undefined>(undefined);
+  article = input<Article | undefined>();
 }

@@ -5,8 +5,7 @@ import {
   withState,
   withComputed,
 } from '@ngrx/signals';
-import { computed, effect, signal } from '@angular/core';
-import { jwtDecode } from 'jwt-decode';
+import { computed } from '@angular/core';
 
 import { User } from '../model/user.model';
 
@@ -27,23 +26,15 @@ export const UserStore = signalStore(
   withState(initialState),
   withComputed((store) => ({
     isAuthenticated: computed(() => store.currentUser() !== null),
-    token: computed(() => store.currentUser()?.token),
+    token: computed(() => localStorage.getItem('jwtToken')),
     username: computed(() => store.currentUser()?.username),
   })),
   withMethods((store) => {
     const TOKEN_KEY = 'jwtToken';
 
-    effect(() => {
-      const token = store.token();
-      if (token) {
-        localStorage.setItem(TOKEN_KEY, token);
-      }
-    });
-
-    const tokenSignal = signal<string | undefined>(undefined);
-
     return {
       setCurrentUser(user: User) {
+        localStorage.setItem(TOKEN_KEY, user.token);
         patchState(store, { currentUser: user, isLoading: false, error: null });
       },
       setLoading(loading: boolean) {
@@ -58,9 +49,8 @@ export const UserStore = signalStore(
       logout() {
         patchState(store, { currentUser: null, isLoading: false, error: null });
         localStorage.removeItem(TOKEN_KEY);
-        tokenSignal.set(undefined);
       },
-      loadUser() {
+      loadUser(user: User | undefined) {
         const token = localStorage.getItem(TOKEN_KEY);
         if (!token) {
           patchState(store, {
@@ -71,25 +61,11 @@ export const UserStore = signalStore(
           return;
         }
 
-        const decodedToken: {
-          id: string;
-          username: string;
-          admin: boolean;
-        } = jwtDecode(token);
-
-        const user: User = {
-          token,
-          username: decodedToken.username,
-          admin: decodedToken.admin,
-        };
-
         patchState(store, {
           currentUser: user,
           isLoading: false,
           error: null,
         });
-
-        tokenSignal.set(token);
       },
     };
   }),

@@ -1,15 +1,15 @@
-<div class="article-preview">
-  <article-meta
-    [username]="username()"
-    [currentUser]="currentUser()"
-  ></article-meta>
-  <a href="/article/how-to-build-webapps-that-scale" class="preview-link">
-    <h1>How to build webapps that scale</h1>
-    <p>This is the description for the post.</p>
-    <span>Read more...</span>
-    <ul class="tag-list">
-      <li class="tag-default tag-pill tag-outline">realworld</li>
-      <li class="tag-default tag-pill tag-outline">implementations</li>
-    </ul>
-  </a>
-</div>
+@if (article(); as article) {
+  <div class="article-preview">
+    <article-meta [article]="article"></article-meta>
+    <a [routerLink]="['/article', article.slug]" class="preview-link">
+      <h1>{{ article.title }}</h1>
+      <p>{{ article.description }}</p>
+      <span>Read more...</span>
+      <ul class="tag-list">
+        @for (tag of article.tagList; track tag) {
+          <li class="tag-default tag-pill tag-outline">{{ tag }}</li>
+        }
+      </ul>
+    </a>
+  </div>
+}
