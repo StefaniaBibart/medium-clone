@@ -1,8 +1,12 @@
 import { Injectable, signal, linkedSignal, inject } from '@angular/core';
 import { Articles } from '../model/articles.model';
-import { httpResource } from '@angular/common/http';
+import { httpResource, HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { UserStore } from '../../user/store/user.store';
+import { NewArticle } from '../model/article.model';
+import { Article } from '../model/article.model';
+import { map } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
@@ -10,6 +14,7 @@ import { UserStore } from '../../user/store/user.store';
 export class ArticleService {
   private apiUrl = environment.apiUrl;
   private store = inject(UserStore);
+  private http = inject(HttpClient);
 
   limit = signal(20);
   offset = signal(0);
@@ -42,4 +47,33 @@ export class ArticleService {
   //     article.tagList.includes('angular'),
   //   );
   // });
+
+  createArticle(article: NewArticle): void {
+    this.store.setLoading(true);
+    this.store.clearError();
+    const token = this.store.token();
+    const headers = {
+      Authorization: `Token ${token}`,
+    };
+    this.http
+      .post<{
+        article: Article;
+      }>(`${this.apiUrl}/articles`, { article: article }, { headers })
+      .pipe(
+        map((response) => {
+          this.store.setLoading(false);
+          return response.article;
+        }),
+      )
+      .subscribe({
+        next: (article) => {
+          // Article created successfully
+          console.log('Article created:', article);
+        },
+        error: (error) => {
+          this.store.setLoading(false);
+          this.store.setError(error);
+        },
+      });
+  }
 }

@@ -12,3 +12,8 @@ export interface Article {
   favoritesCount: number;
   author: Profile;
 }
+
+export type NewArticle = Omit<
+  Article,
+  'slug' | 'createdAt' | 'updatedAt' | 'favorited' | 'favoritesCount' | 'author'
+>;
