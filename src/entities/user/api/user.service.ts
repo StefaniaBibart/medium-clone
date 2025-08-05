@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, effect, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map } from 'rxjs/operators';
 import { UserStore } from '../store/user.store';
@@ -6,7 +6,8 @@ import { NewUser } from '../model/new-user.model';
 import { UserResponse } from '../model/user-response.model';
 import { LoginUser } from '../model/login-user.model';
 import { User } from '../model/user.model';
-// import { httpResource } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { httpResource } from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,13 @@ import { User } from '../model/user.model';
 export class UserService {
   private http = inject(HttpClient);
   private store = inject(UserStore);
-  private apiUrl = 'https://node-express-conduit.appspot.com/api';
+  private apiUrl = environment.apiUrl;
+
+  constructor() {
+    effect(() => {
+      this.store.loadUser(this.getCurrentUser.value()?.user);
+    });
+  }
 
   register(credentials: NewUser): void {
     this.store.setLoading(true);
@@ -52,21 +59,18 @@ export class UserService {
       });
   }
 
-  // endpoint is not working
-  // getCurrentUser() {
-  //   return httpResource<UserResponse>(() => {
-  //     const token = this.store.token();
-  //     if (!token) {
-  //       return undefined;
-  //     }
-  //     return {
-  //       url: `${this.apiUrl}/users`,
-  //       headers: {
-  //         Authorization: `Token ${token}`,
-  //       },
-  //     };
-  //   });
-  // }
+  getCurrentUser = httpResource<UserResponse>(() => {
+    const token = this.store.token();
+    if (!token) {
+      return undefined;
+    }
+    return {
+      url: `${this.apiUrl}/user`,
+      headers: {
+        Authorization: `Token ${token}`,
+      },
+    };
+  });
 
   setCurrentUser(user: User) {
     this.store.setCurrentUser(user);
