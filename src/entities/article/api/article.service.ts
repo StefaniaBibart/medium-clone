@@ -67,12 +67,11 @@ export class ArticleService {
       )
       .subscribe({
         next: (article) => {
-          // Article created successfully
           console.log('Article created:', article);
         },
-        error: (error) => {
+        error: (httpErrorResponse) => {
           this.store.setLoading(false);
-          this.store.setError(error);
+          this.store.setError(httpErrorResponse.error.errors);
         },
       });
   }

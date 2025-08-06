@@ -2,14 +2,13 @@
   <div class="container page">
     <div class="row">
       <div class="col-md-10 offset-md-1 col-xs-12">
-        @if (serverErrors().length > 0) {
+        @if (errorMessages()) {
           <ul class="error-messages">
-            @for (error of serverErrors(); track $index) {
+            @for (error of errorMessages(); track $index) {
               <li>{{ error }}</li>
             }
           </ul>
         }
-
         <form [formGroup]="articleForm" (ngSubmit)="onSubmit()">
           <fieldset>
             <fieldset class="form-group">
