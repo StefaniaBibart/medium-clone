@@ -34,9 +34,9 @@ export class UserService {
           this.store.setCurrentUser(user);
           this.store.setLoading(false);
         },
-        error: (error) => {
+        error: (httpErrorResponse) => {
           this.store.setLoading(false);
-          this.store.setErrors(error);
+          this.store.setErrors(httpErrorResponse.error.errors.body);
         },
       });
   }
@@ -52,9 +52,9 @@ export class UserService {
           this.store.setCurrentUser(user);
           this.store.setLoading(false);
         },
-        error: (error) => {
+        error: (httpErrorResponse) => {
           this.store.setLoading(false);
-          this.store.setErrors(error);
+          this.store.setErrors(httpErrorResponse.error.errors.body);
         },
       });
   }

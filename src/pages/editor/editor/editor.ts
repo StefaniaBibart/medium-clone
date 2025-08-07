@@ -33,7 +33,7 @@ export class Editor {
 
   constructor() {
     effect(() => {
-      this._errorMessages.set(this.store.errors() || null);
+      this._errorMessages.set(this.store.errors() || []);
     });
   }
 
