@@ -26,14 +26,14 @@ export class Editor {
     tagList: [''],
   });
 
-  private _errorMessages = signal<string[] | null>(null);
+  private _errorMessages = signal<string[]>([]);
   readonly errorMessages = this._errorMessages.asReadonly();
   readonly isLoading = this.store.isLoading;
-  readonly authError = this.store.error;
+  readonly authError = this.store.errors;
 
   constructor() {
     effect(() => {
-      this._errorMessages.set(this.store.error()?.['body'] || null);
+      this._errorMessages.set(this.store.errors() || null);
     });
   }
 

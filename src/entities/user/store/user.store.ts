@@ -12,13 +12,13 @@ import { User } from '../model/user.model';
 interface UserState {
   currentUser: User | null;
   isLoading: boolean;
-  error: Record<string, string[]> | null;
+  errors: string[];
 }
 
 const initialState: UserState = {
   currentUser: null,
   isLoading: false,
-  error: null,
+  errors: [],
 };
 
 export const UserStore = signalStore(
@@ -35,19 +35,27 @@ export const UserStore = signalStore(
     return {
       setCurrentUser(user: User) {
         localStorage.setItem(TOKEN_KEY, user.token);
-        patchState(store, { currentUser: user, isLoading: false, error: null });
+        patchState(store, {
+          currentUser: user,
+          isLoading: false,
+          errors: [],
+        });
       },
       setLoading(loading: boolean) {
         patchState(store, { isLoading: loading });
       },
-      setError(error: Record<string, string[]> | null) {
-        patchState(store, { error, isLoading: false });
+      setErrors(errors: string[]) {
+        patchState(store, { errors, isLoading: false });
       },
-      clearError() {
-        patchState(store, { error: null });
+      clearErrors() {
+        patchState(store, { errors: [] });
       },
       logout() {
-        patchState(store, { currentUser: null, isLoading: false, error: null });
+        patchState(store, {
+          currentUser: null,
+          isLoading: false,
+          errors: [],
+        });
         localStorage.removeItem(TOKEN_KEY);
       },
       loadUser(user: User | undefined) {
@@ -56,7 +64,7 @@ export const UserStore = signalStore(
           patchState(store, {
             currentUser: null,
             isLoading: false,
-            error: null,
+            errors: [],
           });
           return;
         }
@@ -64,7 +72,7 @@ export const UserStore = signalStore(
         patchState(store, {
           currentUser: user,
           isLoading: false,
-          error: null,
+          errors: [],
         });
       },
     };

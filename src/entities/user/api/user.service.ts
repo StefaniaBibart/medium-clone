@@ -25,7 +25,7 @@ export class UserService {
 
   register(credentials: NewUser): void {
     this.store.setLoading(true);
-    this.store.clearError();
+    this.store.clearErrors();
     this.http
       .post<UserResponse>(`${this.apiUrl}/users`, { user: credentials })
       .pipe(map((response: UserResponse) => response.user))
@@ -36,14 +36,14 @@ export class UserService {
         },
         error: (error) => {
           this.store.setLoading(false);
-          this.store.setError(error);
+          this.store.setErrors(error);
         },
       });
   }
 
   login(credentials: LoginUser): void {
     this.store.setLoading(true);
-    this.store.clearError();
+    this.store.clearErrors();
     this.http
       .post<UserResponse>(`${this.apiUrl}/users/login`, { user: credentials })
       .pipe(map((response: UserResponse) => response.user))
@@ -54,7 +54,7 @@ export class UserService {
         },
         error: (error) => {
           this.store.setLoading(false);
-          this.store.setError(error);
+          this.store.setErrors(error);
         },
       });
   }

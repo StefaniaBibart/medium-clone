@@ -50,7 +50,7 @@ export class ArticleService {
 
   createArticle(article: NewArticle): void {
     this.store.setLoading(true);
-    this.store.clearError();
+    this.store.clearErrors();
     const token = this.store.token();
     const headers = {
       Authorization: `Token ${token}`,
@@ -67,11 +67,12 @@ export class ArticleService {
       )
       .subscribe({
         next: (article) => {
+          // TODO: redirect to article page
           console.log('Article created:', article);
         },
         error: (httpErrorResponse) => {
           this.store.setLoading(false);
-          this.store.setError(httpErrorResponse.error.errors);
+          this.store.setErrors(httpErrorResponse.error.errors.body);
         },
       });
   }

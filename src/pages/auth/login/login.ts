@@ -35,12 +35,12 @@ export class Login {
 
   readonly serverErrors = this._serverErrors.asReadonly();
   readonly isLoading = this.store.isLoading;
-  readonly authError = this.store.error;
+  readonly authError = this.store.errors;
 
   constructor() {
     effect(() => {
       const user = this.store.currentUser();
-      const error = this.store.error();
+      const error = this.store.errors();
 
       if (user) {
         this.router.navigate(['/']);
