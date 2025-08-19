@@ -7,9 +7,9 @@
           <a href="/register">Need an account?</a>
         </p>
 
-        @if (serverErrors().length > 0) {
+        @if (errorMessages().length > 0) {
           <ul class="error-messages">
-            @for (error of serverErrors(); track $index) {
+            @for (error of errorMessages(); track $index) {
               <li>{{ error }}</li>
             }
           </ul>

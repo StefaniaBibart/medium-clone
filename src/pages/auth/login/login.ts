@@ -6,13 +6,6 @@ import { UserService } from '../../../entities/user/api/user.service';
 import { LoginUser } from '../../../entities/user/model/login-user.model';
 import { UserStore } from '../../../entities/user/store/user.store';
 
-interface LoginError {
-  error?: {
-    errors?: Record<string, string[]>;
-    message?: string;
-  };
-}
-
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -31,58 +24,29 @@ export class Login {
     password: [''],
   });
 
-  private _serverErrors = signal<string[]>([]);
+  private _errorMessages = signal<string[]>([]);
 
-  readonly serverErrors = this._serverErrors.asReadonly();
-  readonly isLoading = this.store.isLoading;
-  readonly authError = this.store.error;
+  protected readonly errorMessages = this._errorMessages.asReadonly();
+  protected readonly isLoading = this.store.isLoading;
+  protected readonly authError = this.store.errors;
 
   constructor() {
     effect(() => {
       const user = this.store.currentUser();
-      const error = this.store.error();
+      const errors = this.store.errors();
 
       if (user) {
         this.router.navigate(['/']);
       }
 
-      if (error) {
-        const errorMessages = this.handleLoginError(
-          error as unknown as LoginError,
-        );
-        this._serverErrors.set(errorMessages);
+      if (errors) {
+        this._errorMessages.set(errors);
       }
     });
   }
 
-  private handleLoginError(error: LoginError): string[] {
-    const errorTypes = {
-      hasFieldErrors: () => error.error?.errors !== undefined,
-      hasMessageError: () => error.error?.message !== undefined,
-    };
-
-    const errorHandlers = {
-      handleFieldErrors: () => {
-        return Object.entries(error.error!.errors!).map(
-          ([field, errors]) => `${field} ${errors}`,
-        );
-      },
-      handleMessageError: () => {
-        return [error.error!.message!];
-      },
-    };
-
-    return errorTypes.hasFieldErrors()
-      ? errorHandlers.handleFieldErrors()
-      : errorTypes.hasMessageError()
-        ? errorHandlers.handleMessageError()
-        : [];
-  }
-
   onSubmit(): void {
     if (this.isLoading()) return;
-
-    this._serverErrors.set([]);
 
     const formValue = this.loginForm.value;
     const userData: LoginUser = {

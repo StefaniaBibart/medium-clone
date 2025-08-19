@@ -1,34 +1,34 @@
 import { Injectable, signal, linkedSignal, inject } from '@angular/core';
 import { Articles } from '../model/articles.model';
-import { httpResource } from '@angular/common/http';
+import { httpResource, HttpClient } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
 import { UserStore } from '../../user/store/user.store';
+import { NewArticle } from '../model/article.model';
+import { Article } from '../model/article.model';
+import { catchError, map } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ArticleService {
-  private apiUrl = environment.apiUrl;
   private store = inject(UserStore);
+  private http = inject(HttpClient);
 
-  limit = signal(20);
-  offset = signal(0);
+  public readonly limit = signal(20);
+  public readonly offset = signal(0);
 
-  articlesResource = httpResource<Articles>(
-    () =>
-      `${this.apiUrl}/articles?limit=${this.limit()}&offset=${this.offset()}`,
+  public readonly articlesResource = httpResource<Articles>(
+    () => `/articles?limit=${this.limit()}&offset=${this.offset()}`,
   );
 
-  articlesResourceYourFeed = httpResource<Articles>(() => {
+  public readonly articlesResourceYourFeed = httpResource<Articles>(() => {
     const token = this.store.token();
     if (!token) {
       return undefined;
     }
     return {
-      url: `${this.apiUrl}/articles/feed?limit=${this.limit()}&offset=${this.offset()}`,
-      headers: {
-        Authorization: `Token ${token}`,
-      },
+      url: `/articles/feed?limit=${this.limit()}&offset=${this.offset()}`,
     };
   });
 
@@ -42,4 +42,31 @@ export class ArticleService {
   //     article.tagList.includes('angular'),
   //   );
   // });
+
+  createArticle(article: NewArticle): void {
+    this.store.setLoading(true);
+    this.store.clearErrors();
+    this.http
+      .post<{
+        article: Article;
+      }>(`/articles`, { article: article })
+      .pipe(
+        map((response) => {
+          return response.article;
+        }),
+        catchError((error) => {
+          this.store.setErrors(error.error.errors.body);
+          return of(null);
+        }),
+      )
+      .subscribe({
+        next: (article) => {
+          if (article) {
+            // TODO: redirect to article page
+            console.log('Article created:', article);
+          }
+          this.store.setLoading(false);
+        },
+      });
+  }
 }

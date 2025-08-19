@@ -7,9 +7,9 @@
           <a href="/login">Have an account?</a>
         </p>
 
-        @if (errors().length > 0) {
+        @if (errorMessages().length > 0) {
           <ul class="error-messages">
-            @for (error of errors(); track $index) {
+            @for (error of errorMessages(); track $index) {
               <li>{{ error }}</li>
             }
           </ul>
