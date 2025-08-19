@@ -13,13 +13,14 @@ import { ArticleService } from '../../entities/article/api/article.service';
 })
 export class Home {
   private store = inject(UserStore);
-  public articleService = inject(ArticleService);
-  articles = this.articleService.articlesResource;
-  articlesYourFeed = this.articleService.articlesResourceYourFeed;
-  isAuthenticated = this.store.isAuthenticated;
-  currentPage = signal(1);
+  private articleService = inject(ArticleService);
+  protected readonly articles = this.articleService.articlesResource;
+  protected readonly articlesYourFeed =
+    this.articleService.articlesResourceYourFeed;
+  protected readonly isAuthenticated = this.store.isAuthenticated;
+  protected readonly currentPage = signal(1);
 
-  pages = computed(() => {
+  protected readonly pages = computed(() => {
     const articlesData = this.articles.value();
     if (!articlesData) {
       return [];
@@ -36,7 +37,9 @@ export class Home {
     this.articleService.offset.set(offset);
   }
 
-  currentFeed = signal<'yourFeed' | 'globalFeed'>('globalFeed');
+  protected readonly currentFeed = signal<'yourFeed' | 'globalFeed'>(
+    'globalFeed',
+  );
 
   onFeedChange(feed: 'yourFeed' | 'globalFeed') {
     this.currentFeed.set(feed);

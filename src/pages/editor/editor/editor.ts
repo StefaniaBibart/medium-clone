@@ -27,9 +27,9 @@ export class Editor {
   });
 
   private _errorMessages = signal<string[]>([]);
-  readonly errorMessages = this._errorMessages.asReadonly();
-  readonly isLoading = this.store.isLoading;
-  readonly authError = this.store.errors;
+  protected readonly errorMessages = this._errorMessages.asReadonly();
+  protected readonly isLoading = this.store.isLoading;
+  protected readonly authError = this.store.errors;
 
   constructor() {
     effect(() => {

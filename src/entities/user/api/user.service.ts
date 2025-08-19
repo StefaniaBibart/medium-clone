@@ -1,6 +1,7 @@
 import { Injectable, effect, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { map } from 'rxjs/operators';
+import { map, catchError } from 'rxjs/operators';
+import { of } from 'rxjs';
 import { UserStore } from '../store/user.store';
 import { NewUser } from '../model/new-user.model';
 import { UserResponse } from '../model/user-response.model';
@@ -15,11 +16,20 @@ import { httpResource } from '@angular/common/http';
 export class UserService {
   private http = inject(HttpClient);
   private store = inject(UserStore);
-  private apiUrl = environment.apiUrl;
+  private autoLogoutTimer: number | null = null;
 
   constructor() {
     effect(() => {
       this.store.loadUser(this.getCurrentUser.value()?.user);
+    });
+
+    effect(() => {
+      const token = this.store.token();
+      if (token) {
+        this.startAutoLogoutTimer(token);
+      } else {
+        this.stopAutoLogoutTimer();
+      }
     });
   }
 
@@ -27,16 +37,21 @@ export class UserService {
     this.store.setLoading(true);
     this.store.clearErrors();
     this.http
-      .post<UserResponse>(`${this.apiUrl}/users`, { user: credentials })
-      .pipe(map((response: UserResponse) => response.user))
-      .subscribe({
-        next: (user) => {
-          this.store.setCurrentUser(user);
-          this.store.setLoading(false);
-        },
-        error: (httpErrorResponse) => {
+      .post<UserResponse>(`/users`, { user: credentials })
+      .pipe(
+        map((response: UserResponse) => response.user),
+        catchError((httpErrorResponse) => {
           this.store.setLoading(false);
           this.store.setErrors(httpErrorResponse.error.errors.body);
+          return of(null);
+        }),
+      )
+      .subscribe({
+        next: (user) => {
+          if (user) {
+            this.store.setCurrentUser(user);
+          }
+          this.store.setLoading(false);
         },
       });
   }
@@ -45,16 +60,21 @@ export class UserService {
     this.store.setLoading(true);
     this.store.clearErrors();
     this.http
-      .post<UserResponse>(`${this.apiUrl}/users/login`, { user: credentials })
-      .pipe(map((response: UserResponse) => response.user))
-      .subscribe({
-        next: (user) => {
-          this.store.setCurrentUser(user);
-          this.store.setLoading(false);
-        },
-        error: (httpErrorResponse) => {
+      .post<UserResponse>(`/users/login`, { user: credentials })
+      .pipe(
+        map((response: UserResponse) => response.user),
+        catchError((httpErrorResponse) => {
           this.store.setLoading(false);
           this.store.setErrors(httpErrorResponse.error.errors.body);
+          return of(null);
+        }),
+      )
+      .subscribe({
+        next: (user) => {
+          if (user) {
+            this.store.setCurrentUser(user);
+          }
+          this.store.setLoading(false);
         },
       });
   }
@@ -65,10 +85,7 @@ export class UserService {
       return undefined;
     }
     return {
-      url: `${this.apiUrl}/user`,
-      headers: {
-        Authorization: `Token ${token}`,
-      },
+      url: `/user`,
     };
   });
 
@@ -78,5 +95,37 @@ export class UserService {
 
   logout(): void {
     this.store.logout();
+  }
+
+  private startAutoLogoutTimer(token: string) {
+    this.stopAutoLogoutTimer();
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const expiration = payload.exp * 1000;
+      const now = new Date().getTime();
+      const expiresIn = expiration - now;
+
+      if (expiresIn > 0) {
+        this.autoLogoutTimer = setTimeout(() => {
+          this.logout();
+          alert('Session expired. Please log in again.');
+        }, expiresIn);
+      } else {
+        this.logout();
+        alert('Session expired. Please log in again.');
+      }
+    } catch (e) {
+      console.error('Invalid token, could not set up auto-logout.', e);
+      this.logout();
+      alert('You have been logged out due to an error. Please log in again.');
+    }
+  }
+
+  private stopAutoLogoutTimer() {
+    if (this.autoLogoutTimer) {
+      clearTimeout(this.autoLogoutTimer);
+      this.autoLogoutTimer = null;
+    }
   }
 }
